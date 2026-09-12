@@ -1,0 +1,17 @@
+# Python geçici dosyaları
+__pycache__/
+*.pyc
+
+# SQLite veritabanı çalışma dosyaları
+database/*.db
+
+# Otomatik oluşturulan raporlar
+reports/*.json
+reports/*.csv
+
+# IDE dosyaları
+.idea/
+
+# İşletim sistemi dosyaları
+.DS_Store
+Thumbs.db

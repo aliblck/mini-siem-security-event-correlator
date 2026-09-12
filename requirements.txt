@@ -1,0 +1,2 @@
+# Mini SIEM başlangıç sürümünde harici Python paketi kullanılmamaktadır.
+# Tkinter ve SQLite Python standart kütüphanesindedir.
