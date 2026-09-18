@@ -24,8 +24,8 @@ class DatabaseManager:
         self.db_path = Path(__file__).resolve().parent / "events.db"
 
         # Program başladığında gerekli tabloyu hazırlarız.
-        self.create_table()
-
+        self.create_table() 
+        self.create_analyst_table()
     def get_connection(self):
         """
         SQLite veritabanına bağlantı oluşturur.
@@ -170,7 +170,95 @@ class DatabaseManager:
         connection.close()
 
         return count
+    # ========================================================
+    # ANALYST CONCLUSION TABLOSU
+    # ========================================================
 
+    def create_analyst_table(self):
+        """
+        Analistin incident hakkında yazdığı sonucu
+        saklamak için tablo oluşturur.
+        """
+
+        connection = self.get_connection()
+        cursor = connection.cursor()
+
+        cursor.execute(
+            """
+            CREATE TABLE IF NOT EXISTS analyst_conclusions (
+                incident_id TEXT PRIMARY KEY,
+                conclusion TEXT
+            )
+            """
+        )
+
+        connection.commit()
+        connection.close()
+
+    # ========================================================
+    # ANALYST CONCLUSION KAYDETME
+    # ========================================================
+
+    def save_analyst_conclusion(self, incident_id, conclusion):
+        """
+        Analistin yazdığı sonucu SQLite veritabanına kaydeder.
+
+        Aynı Incident ID daha önce varsa
+        eski kayıt güncellenir.
+        """
+
+        connection = self.get_connection()
+        cursor = connection.cursor()
+
+        cursor.execute(
+            """
+            INSERT OR REPLACE INTO analyst_conclusions (
+                incident_id,
+                conclusion
+            )
+            VALUES (?, ?)
+            """,
+            (
+                incident_id,
+                conclusion
+            )
+        )
+
+        connection.commit()
+        connection.close()
+
+    # ========================================================
+    # ANALYST CONCLUSION OKUMA
+    # ========================================================
+
+    def get_analyst_conclusion(self, incident_id):
+        """
+        Belirtilen incident için daha önce kaydedilmiş
+        analist sonucunu döndürür.
+        """
+
+        connection = self.get_connection()
+        cursor = connection.cursor()
+
+        cursor.execute(
+            """
+            SELECT conclusion
+            FROM analyst_conclusions
+            WHERE incident_id = ?
+            """,
+            (
+                incident_id,
+            )
+        )
+
+        result = cursor.fetchone()
+
+        connection.close()
+
+        if result is None:
+            return ""
+
+        return result[0]
 
 # ============================================================
 # TEST BÖLÜMÜ
